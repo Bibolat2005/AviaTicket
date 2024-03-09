@@ -1,13 +1,14 @@
 package com.example.aviatickets.fragment
 
+import OfferListAdapter
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.aviatickets.R
-import com.example.aviatickets.adapter.OfferListAdapter
 import com.example.aviatickets.databinding.FragmentOfferListBinding
+import com.example.aviatickets.model.network.ApiClient
 import com.example.aviatickets.model.service.FakeService
 
 
@@ -37,7 +38,9 @@ class OfferListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupUI()
-        adapter.setItems(FakeService.offerList)
+        val client = ApiClient.instance
+        val response = client.fetchPersonList()
+        //adapter.setItems(response)
     }
 
     private fun setupUI() {
@@ -47,18 +50,24 @@ class OfferListFragment : Fragment() {
             sortRadioGroup.setOnCheckedChangeListener { _, checkedId ->
                 when (checkedId) {
                     R.id.sort_by_price -> {
-                        /**
-                         * implement sorting by price
-                         */
+                        sortOfferListByPrice()
                     }
 
                     R.id.sort_by_duration -> {
-                        /**
-                         * implement sorting by duration
-                         */
+                        sortOfferListByDuration()
                     }
                 }
             }
         }
     }
+    private fun sortOfferListByPrice() {
+        val sortedList = FakeService.offerList.sortedBy { it.price }
+        adapter.setItems(sortedList)
+    }
+
+    private fun sortOfferListByDuration() {
+        val sortedList = FakeService.offerList.sortedBy { it.flight.duration }
+        adapter.setItems(sortedList)
+    }
+
 }
